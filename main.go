@@ -54,6 +54,7 @@ func (s ParcelService) Register(client int, address string) (Parcel, error) {
 func (s ParcelService) PrintClientParcels(client int) error {
 	parcels, err := s.store.GetByClient(client)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
@@ -97,9 +98,16 @@ func (s ParcelService) Delete(number int) error {
 }
 
 func main() {
-	// настройте подключение к БД
 
-	store := // создайте объект ParcelStore функцией NewParcelStore
+	// настройте подключение к БД
+	db, err := sql.Open("sqlite", "tracker.db")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer db.Close()
+
+	store := NewParcelStore(db) // создайте объект ParcelStore функцией NewParcelStore
 	service := NewParcelService(store)
 
 	// регистрация посылки
@@ -137,7 +145,6 @@ func main() {
 	err = service.Delete(p.Number)
 	if err != nil {
 		fmt.Println(err)
-		return
 	}
 
 	// вывод посылок клиента
@@ -149,14 +156,14 @@ func main() {
 	}
 
 	// регистрация новой посылки
-	p, err = service.Register(client, address)
+	p1, err := service.Register(client, address)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
 	// удаление новой посылки
-	err = service.Delete(p.Number)
+	err = service.Delete(p1.Number)
 	if err != nil {
 		fmt.Println(err)
 		return
