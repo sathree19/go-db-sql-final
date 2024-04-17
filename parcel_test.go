@@ -60,12 +60,12 @@ func TestAddGetDelete(t *testing.T) {
 	// delete
 	// удалите добавленную посылку, убедитесь в отсутствии ошибки
 	// проверьте, что посылку больше нельзя получить из БД
+
 	err = store.Delete(number)
 	require.NoError(t, err)
-	require.NotEmpty(t, number)
 
-	p, err = store.Get(number)
-	require.Error(t, err)
+	_, err = store.Get(number)
+	require.Equal(t, sql.ErrNoRows, err)
 }
 
 // TestSetAddress проверяет обновление адреса

@@ -44,30 +44,26 @@ func (s ParcelStore) Get(number int) (Parcel, error) {
 	// здесь из таблицы должна вернуться только одна строка
 	var p Parcel
 
-	row, err := s.db.Query("SELECT client, status, address, created_at FROM parcel WHERE number = :number", sql.Named("number", number))
+	row := s.db.QueryRow("SELECT number, client, status, address, created_at FROM parcel WHERE number = :number", sql.Named("number", number))
+
+	//var (
+	//	client    int
+	//	status    string
+	//	address   string
+	//	createdAt string
+	//)
+	err := row.Scan(&p.Number, &p.Client, &p.Status, &p.Address, &p.CreatedAt)
 	if err != nil {
+		fmt.Println(err)
 		return p, err
 	}
 
-	var (
-		client    int
-		status    string
-		address   string
-		createdAt string
-	)
-	for row.Next() {
-		err = row.Scan(&client, &status, &address, &createdAt)
-		if err != nil {
-			return p, err
-		}
-	}
-
 	// заполните объект Parcel данными из таблицы
-	p.Number = number
-	p.Client = client
-	p.Status = status
-	p.Address = address
-	p.CreatedAt = createdAt
+	//p.Number = number
+	//p.Client = client
+	//p.Status = status
+	//p.Address = address
+	//p.CreatedAt = createdAt
 
 	return p, nil
 }
